@@ -1,0 +1,79 @@
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "rhel-openssl-1.0.x"]
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model subcategory {
+  id          Int       @id @default(autoincrement())
+  name        String    @db.VarChar(50)
+  image       String?   @db.VarChar(500)
+  created_at  DateTime? @db.DateTime(0)
+  updated_at  DateTime? @db.DateTime(0)
+  category_id Int?
+  posts       posts[]
+}
+
+model users {
+  id           Int        @id @default(autoincrement())
+  first_name   String?    @db.VarChar(45)
+  last_name    String?    @db.VarChar(45)
+  image        String?    @db.VarChar(45)
+  created_at   DateTime?  @db.DateTime(0)
+  updated_at   DateTime?  @db.DateTime(0)
+  phone_number String     @db.VarChar(45)
+  favorite     favorite[]
+}
+
+model categories {
+  id            Int       @id @default(autoincrement())
+  category_name String    @db.VarChar(100)
+  image         String?   @db.VarChar(500)
+  created_at    DateTime? @db.DateTime(0)
+  updated_at    DateTime? @db.DateTime(0)
+  posts         posts[]
+}
+
+model favorite {
+  id         Int       @id @default(autoincrement())
+  created_at DateTime? @db.DateTime(0)
+  updated_at DateTime? @db.DateTime(0)
+  post_id    Int?
+  user_id    Int?
+  posts      posts?    @relation(fields: [post_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk__post_fav")
+  users      users?    @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk__post_fav_user")
+
+  @@index([post_id], map: "fk__post_fav")
+  @@index([user_id], map: "fk__post_fav_user")
+}
+
+model posts {
+  id              Int          @id @default(autoincrement())
+  title           String       @db.VarChar(45)
+  description     String?      @db.VarChar(500)
+  images          String?      @db.VarChar(500)
+  price           Float
+  address         String?      @db.VarChar(500)
+  lat             Float?
+  long            Float?
+  views           Int
+  quantity        Float?
+  breed           String?      @db.VarChar(45)
+  age             Int?
+  status          String?      @db.VarChar(50)
+  created_at      DateTime?    @db.DateTime(0)
+  updated_at      DateTime?    @db.DateTime(0)
+  featured        Int?
+  category_id     Int?
+  sub_category_id Int?
+  favorite        favorite[]
+  categories      categories?  @relation(fields: [category_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk__post_with_category")
+  subcategory     subcategory? @relation(fields: [sub_category_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk__post_with_sub_category")
+
+  @@index([category_id], map: "fk__post_with_category")
+  @@index([sub_category_id], map: "fk__post_with_sub_category")
+}
