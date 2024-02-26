@@ -1,7 +1,5 @@
 import { Router } from "express"
 import handler from '../handlers/index.js'
-import todoRouter from "./todo.router.js"
-import vendorRouter from "./vendor.router.js"
 import customerRouter from "./customer.router.js"
 import postsRouter from "./posts.router.js"
 

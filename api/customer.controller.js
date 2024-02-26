@@ -1,6 +1,5 @@
 import TokenHandler from "../handlers/token.handler.js"
 import CustomerService from "../services/customer.service.js"
-import VendorController from "./vendor.controller.js"
 import config from '../config/index.js'
 
 let customerServ = new CustomerService()
