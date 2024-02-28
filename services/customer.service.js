@@ -170,6 +170,24 @@ export default class CustomerService {
         return servResp
     }
 
+    async login(query) {
+        let servResp = new config.serviceResponse()
+        try {
+            let customer = await db.users.findFirst({ where: { phone_number: query.phone_number} })
+            let token = await JWT.getToken(customer)
+            servResp.data = {
+                ...customer, token: token
+            }
+            
+            console.debug('getCustomer() returning')
+        } catch (error) {
+            console.debug('getCustomer() exception thrown')
+            servResp.isError = true
+            servResp.message = error.message
+        }
+        return servResp
+    }
+
     async getCustomer(req) {
         let servResp = new config.serviceResponse()
         try {
