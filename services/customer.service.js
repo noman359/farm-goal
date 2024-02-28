@@ -174,6 +174,10 @@ export default class CustomerService {
         let servResp = new config.serviceResponse()
         try {
             let customer = await db.users.findFirst({ where: { phone_number: query.phone_number} })
+
+            if (!customer) {
+                throw new Error('User not found')
+            }
             let token = await JWT.getToken(customer)
             servResp.data = {
                 ...customer, token: token
