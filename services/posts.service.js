@@ -3,14 +3,14 @@ import config from '../config/index.js'
 import Prisma from '@prisma/client';
 const { PrismaClient } = Prisma;
 import admin from 'firebase-admin';
-import serviceAccount from '../urbancabsvender-firebase-adminsdk-70gg2-1c61b6ef2c.json' assert { type: "json" };
+// import serviceAccount from '../urbancabsvender-firebase-adminsdk-70gg2-1c61b6ef2c.json' assert { type: "json" };
 import { parse, format } from 'date-fns';
 import TokenHandler from "../handlers/token.handler.js"
 
-admin.initializeApp({
-    credential: admin.credential.cert(serviceAccount),
-    // other configurations...
-});
+// admin.initializeApp({
+//     credential: admin.credential.cert(serviceAccount),
+//     // other configurations...
+// });
 let db = new PrismaClient({ log: ['query', 'info', 'warn', 'error'] })
 let bucket = new handler.bucketHandler()
 let encryption = new handler.encryption()
