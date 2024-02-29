@@ -16,5 +16,7 @@ export default function (router) {
     lRoute.post('/featured/:id', jobsController.featured,handler.apiResponseHandler)
     lRoute.get('/list', jobsController.getPosts,handler.apiResponseHandler)
     lRoute.get('/home', jobsController.getHomeData,handler.apiResponseHandler)
+    lRoute.get('/favoriteList', jobsController.getFavoriteData,handler.apiResponseHandler)
+    
 
 }

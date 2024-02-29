@@ -422,11 +422,10 @@ export default class PostService {
         return servResp
     }
 
-    async getFavoriteList(filters) {
+    async getFavoriteList(req) {
         let servResp = new config.serviceResponse()
         var images = []
-        console.log(post)
-
+        var queryParams = req.query
         let token = await tokenHandler.checkToken(req)
         if (token.isError == true) {
             servResp.isError = true
@@ -439,8 +438,8 @@ export default class PostService {
 
             servResp.data = await db.favorite.findMany({
                 where: { user_id: Number(token.id) },
-                skip: (filters.offset - 1) * filters.limit, // Calculate the number of records to skip based on page number
-                take: filters.limit, // Set the number of records to be returned per page
+                skip: (Number(queryParams.offset) - 1) * Number(queryParams.limit), // Calculate the number of records to skip based on page number
+                take: Number(queryParams.limit), // Set the number of records to be returned per page
                 include: {
                     posts: true
                 }

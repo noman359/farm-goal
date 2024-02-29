@@ -51,7 +51,7 @@ export default class PostController {
     }
 
     async getFavoriteData(req, res, next) {
-        let created_customer = await customerServ.getHomeData(req)
+        let created_customer = await customerServ.getFavoriteList(req)
          next(created_customer)
     }
 
