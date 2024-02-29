@@ -385,13 +385,13 @@ export default class PostService {
                 where: { user_id: Number(token.id) },
             })
            
-            let categories = await db.categories.findMany()
+            let categoryList = await db.categories.findMany()
 
-            for (let cat in categories) {
+            for (let  catItem of categoryList) {
                 var obj = {};
                 let mainList = await db.posts.findMany({
                     where: {
-                        category_id: Number(cat.category_id)
+                        category_id: Number(catItem.id)
                     },
                     take:10
                 })
@@ -405,7 +405,8 @@ export default class PostService {
                     ...item,
                     isFavorited: favoritedMap[item.id] || false,
                 }));
-                obj.category = item.name
+                obj.category_id = catItem.id
+                obj.category = catItem.category_name
                 obj.items = mainListWithFavorites
                 homeData.push(obj)
             }

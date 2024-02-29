@@ -15,6 +15,6 @@ export default function (router) {
     lRoute.post('/status/:id', jobsController.changeAdStatus,handler.apiResponseHandler)
     lRoute.post('/featured/:id', jobsController.featured,handler.apiResponseHandler)
     lRoute.get('/list', jobsController.getPosts,handler.apiResponseHandler)
-    lRoute.get('/home', jobsController.getPosts,handler.apiResponseHandler)
+    lRoute.get('/home', jobsController.getHomeData,handler.apiResponseHandler)
 
 }
