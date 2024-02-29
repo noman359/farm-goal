@@ -7,7 +7,7 @@ export default class CustomerController {
     constructor() { }
 
     async getCategories(req, res, next) {
-        let services = await servicesServ.getCategories({ limit: Number(req.query.limit ?? 10), offset: Number(req.query.offset ?? 0), filter: req.query.filter, search: req.query.search })
+        let services = await servicesServ.getCategories({ limit: Number(req.query.limit ?? 10), offset: Number(req.query.offset ?? 0), search: req.query.search })
         next(services)
     }
 

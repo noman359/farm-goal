@@ -8,26 +8,41 @@ export default class ServicesService {
 
     constructor() { }
 
-    async getCategories(filters = {
-        limit: 10, offset: 0, search: "", filter: {}
-    }) {
+    async getCategories(filters) {
         let servResp = new config.serviceResponse()
+
+        var categoriesList = []
+        var count = 0
+
         try {
-            let [categories, count] = await db.$transaction([db.categories.findMany({
-                where: { name: { contains: filters.search } },
-                skip: (filters.offset - 1) * filters.limit, // Calculate the number of records to skip based on page number
-                take: filters.limit, // Set the number of records to be returned per page
-            }), db.services.count({
-                where: { name: { contains: filters.search } },
-                skip: (filters.offset - 1) * filters.limit,
-                take: filters.limit
-            })])
+
+            if (filters.search) {
+                [categoriesList, count] = await db.$transaction([db.categories.findMany({
+                    where: { category_name: { contains: filters.search ?? '' } },
+                    skip: (filters.offset - 1) * filters.limit, // Calculate the number of records to skip based on page number
+                    take: filters.limit, // Set the number of records to be returned per page
+                }), db.categories.count({
+                    where: { category_name: { contains: filters.search ?? '' } },
+                    skip: (filters.offset - 1) * filters.limit,
+                    take: filters.limit
+                })])
+            } else {
+                [categoriesList, count] = await db.$transaction([db.categories.findMany({
+                    skip: (filters.offset - 1) * filters.limit, // Calculate the number of records to skip based on page number
+                    take: filters.limit, // Set the number of records to be returned per page
+                }), db.categories.count({
+                    skip: (filters.offset - 1) * filters.limit,
+                    take: filters.limit
+                })])
+            }
+
             servResp.data = {
-                services: categories,
+                categories: categoriesList,
                 count: count
             }
+
         } catch (error) {
-            console.debug('createVendor() exception thrown')
+            console.debug('getCategories() exception thrown')
             servResp.isError = true
             servResp.message = error.message
         }
