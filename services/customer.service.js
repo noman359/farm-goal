@@ -24,7 +24,7 @@ export default class CustomerService {
             console.debug('createCustomer() started')
             if (customerBody.avatar) {
                 var arr = customerBody.avatar.name.split('.')
-                    let extentionName = arr[arr.length - 1]
+                let extentionName = arr[arr.length - 1]
                 let avatar_val = {
                     bucket: config.customer_avatar_s3_bucket_name,
                     key: `${customerBody.email}_${customerBody.avatar['name']}.${extentionName}`,
@@ -42,12 +42,12 @@ export default class CustomerService {
                 if (customer != null) {
                     servResp.data = null
                     servResp.message = 'User already exist'
-                    servResp.isError =  true
+                    servResp.isError = true
                     return servResp
                 }
-             
+
             }
-           
+
             await db.users.create({
                 data: {
                     phone_number: customerBody.phone_number,
@@ -93,9 +93,9 @@ export default class CustomerService {
                 servResp.isError = true
                 servResp.message = 'Token is not valid'
                 return servResp
-            } 
+            }
 
-            
+
             console.debug('update Customer() started')
             let customer = await db.users.findFirst({ where: { id: token.id } })
 
@@ -182,7 +182,7 @@ export default class CustomerService {
                 servResp.isError = true
                 servResp.message = 'Token is not valid'
                 return servResp
-            } 
+            }
             console.debug('getVendorData() started')
             let customer = await db.users.update({
                 where: {
@@ -206,7 +206,12 @@ export default class CustomerService {
     async login(query) {
         let servResp = new config.serviceResponse()
         try {
-            let customer = await db.users.findFirst({ where: { phone_number: query.phone_number} })
+            let customer = await db.users.findFirst({ 
+                where: { phone_number: query.phone_number },
+                include: {
+                    cities: true
+                }
+             })
 
             if (!customer) {
                 throw new Error('User not found')
@@ -215,7 +220,7 @@ export default class CustomerService {
             servResp.data = {
                 ...customer, token: token
             }
-            
+
             console.debug('getCustomer() returning')
         } catch (error) {
             console.debug('getCustomer() exception thrown')
@@ -233,9 +238,16 @@ export default class CustomerService {
                 servResp.isError = true
                 servResp.message = 'Token is not valid'
                 return servResp
-            } 
+            }
             console.debug('getCustomer() started')
-            servResp.data = await db.users.findFirst({ where: { id: Number(token.id) } })
+            servResp.data = await db.users.findFirst({
+                where: {
+                    id: Number(token.id)
+                },
+                include: {
+                    cities: true
+                }
+            })
             console.debug('getCustomer() returning')
         } catch (error) {
             console.debug('getCustomer() exception thrown')
@@ -252,6 +264,9 @@ export default class CustomerService {
             let customer = await db.users.findFirst({
                 where: {
                     phone_number: query.phone_number
+                },
+                include: {
+                    city: true
                 }
             })
 
