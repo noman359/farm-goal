@@ -1,7 +1,6 @@
 import Prisma from '@prisma/client';
 const { PrismaClient } = Prisma;
 import config from '../config/index.js'
-
 let db = new PrismaClient({ log: ['query', 'info', 'warn', 'error'] })
 
 export default class ServicesService {

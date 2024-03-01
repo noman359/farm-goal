@@ -107,7 +107,7 @@ export default class CustomerService {
                 if (typeof customerBody.avatar === 'string') {
                     customer_avatar['url'] = customerBody.avatar
                 } else {
-                    var arr = customerBody.avatar.split('.')
+                    var arr = customerBody.avatar.name.split('.')
                     let extentionName = arr[arr.length - 1]
                     let avatar_val = {
                         bucket: config.customer_avatar_s3_bucket_name,
@@ -118,14 +118,47 @@ export default class CustomerService {
                 }
             }
 
+            var first_name = customer.first_name
+            if (customerBody.first_name) {
+                first_name = customerBody.first_name
+            }
+
+            var last_name = customer.last_name
+            if (customerBody.last_name) {
+                last_name = customerBody.last_name
+            }
+
+            var farm_name = customer.farm_name
+            if (customerBody.farm_name) {
+                farm_name = customerBody.farm_name
+            }
+
+            var image = customer.image
+            if (customer_avatar.url) {
+                image = customer_avatar.url
+            }
+
+            var city_id = customer.city_id
+            if (customerBody.city_id) {
+                city_id = customerBody.city_id
+            }
+
+            var address = customer.address
+            if (customerBody.address) {
+                address = customerBody.address
+            }
+
             // customerBody.password = encryption.encrypt(customerBody.password)
             let updatedCustomer = await db.users.update({
                 data: {
-                    first_name: customerBody.first_name || undefined,
-                    last_name: customerBody.last_name || undefined,
-                    image: customer_avatar.url ? customer_avatar.url : undefined,
+                    first_name: first_name || undefined,
+                    last_name: last_name || undefined,
+                    image: image || undefined,
                     updated_at: new Date(new Date().toUTCString()),
                     phone_number: customerBody.phone_number || undefined,
+                    address: address,
+                    farm_name: farm_name,
+                    city_id: Number(city_id)
                 },
                 where: {
                     id: Number(token.id)
@@ -238,5 +271,7 @@ export default class CustomerService {
         }
         return servResp
     }
+
+
 
 }

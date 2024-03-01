@@ -3,6 +3,7 @@ import handler from '../handlers/index.js'
 import customerRouter from "./customer.router.js"
 import postsRouter from "./posts.router.js"
 import categoryRouter from "./category.router.js"
+import citiesRouter from "./cities.router.js"
 
 
 export default () => {
@@ -13,6 +14,7 @@ export default () => {
    // serviceRouter(router)
     postsRouter(router)
     categoryRouter(router)
+    citiesRouter(router)
    // adminRouter(router)
     router.use(handler.apiResponseHandler)
     return router
