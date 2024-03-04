@@ -54,7 +54,7 @@ export default class PostService {
                     images.push(post_image.url)
                 }
             }
-            
+
 
             servResp.data = await db.posts.create({
 
@@ -70,6 +70,7 @@ export default class PostService {
                     breed: post.breed,
                     age: Number(post.age),
                     status: 'active',
+                    user_id: Number(token.id),
                     category_id: post.category_id,
                     sub_category_id: post.sub_category_id,
                     created_at: new Date(new Date().toUTCString())
@@ -232,7 +233,7 @@ export default class PostService {
         let servResp = new config.serviceResponse()
         let id = req.params.id
         let status = req.body.status
-        
+
         let token = await tokenHandler.checkToken(req)
         if (token.isError == true) {
             servResp.isError = true
@@ -367,6 +368,56 @@ export default class PostService {
         return servResp
     }
 
+    async getMyAds(req) {
+        let servResp = new config.serviceResponse()
+        var mainListWithFavorites = []
+        let data = req.query
+        let token = await tokenHandler.checkToken(req)
+        if (token.isError == true) {
+            servResp.isError = true
+            servResp.message = 'Token is not valid'
+            return servResp
+        }
+
+        try {
+            console.debug('updating post() started')
+
+            let favoriteList = await db.favorite.findMany({
+                where: { user_id: Number(token.id) },
+            })
+
+            let mainList = await db.posts.findMany({
+                where: {
+                    user_id: Number(token.id)
+                },
+                skip: (Number(data.offset) - 1) * Number(data.limit), // Calculate the number of records to skip based on page number
+                take: Number(data.limit), // Set the number of records to be returned per page
+            })
+
+            // Create a mapping of itemId to favorited status
+            const favoritedMap = favoriteList.reduce((map, favorite) => {
+                map[favorite.post_id] = true;
+                return map;
+            }, {});
+
+            // Update the mainList with favorited status
+            mainListWithFavorites = mainList.map((item) => ({
+                ...item,
+                isFavorited: favoritedMap[item.id] || false,
+            }));
+
+
+            servResp.data = mainListWithFavorites
+            console.debug('updatePost() returning')
+
+        } catch (error) {
+            console.debug('createPost() exception thrown')
+            servResp.isError = true
+            servResp.message = error.message
+        }
+        return servResp
+    }
+
     async getHomeData(req) {
         let servResp = new config.serviceResponse()
         var mainListWithFavorites = []
@@ -384,18 +435,18 @@ export default class PostService {
             let favoriteList = await db.favorite.findMany({
                 where: { user_id: Number(token.id) },
             })
-           
+
             let categoryList = await db.categories.findMany()
 
-            for (let  catItem of categoryList) {
+            for (let catItem of categoryList) {
                 var obj = {};
                 let mainList = await db.posts.findMany({
                     where: {
                         category_id: Number(catItem.id)
                     },
-                    take:10
+                    take: 10
                 })
-                
+
                 const favoritedMap = favoriteList.reduce((map, favorite) => {
                     map[favorite.post_id] = true;
                     return map;

@@ -1,7 +1,6 @@
 import handler from '../handlers/index.js';
 import formData from '../middlewares/formdata-parser.js';
 import { Router } from 'express';
-import  CronHandler  from '../handlers/userStatus.js';
 import PostController from '../api/posts.controller.js';
 
 const jobsController = new PostController()
@@ -15,8 +14,8 @@ export default function (router) {
     lRoute.post('/status/:id', jobsController.changeAdStatus,handler.apiResponseHandler)
     lRoute.post('/featured/:id', jobsController.featured,handler.apiResponseHandler)
     lRoute.get('/list', jobsController.getPosts,handler.apiResponseHandler)
+    lRoute.get('/myads', jobsController.getMyads,handler.apiResponseHandler)
     lRoute.get('/home', jobsController.getHomeData,handler.apiResponseHandler)
     lRoute.get('/favoriteList', jobsController.getFavoriteData,handler.apiResponseHandler)
-    
 
 }

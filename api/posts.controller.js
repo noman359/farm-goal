@@ -45,6 +45,11 @@ export default class PostController {
          next(created_customer)
     }
 
+    async getMyads(req, res, next) {
+        let created_customer = await customerServ.getMyAds(req)
+         next(created_customer)
+    }
+
     async getHomeData(req, res, next) {
         let created_customer = await customerServ.getHomeData(req)
          next(created_customer)
