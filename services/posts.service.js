@@ -305,17 +305,27 @@ export default class PostService {
             servResp.message = 'Token is not valid'
             return servResp
         }
-
+        const minPrice = Number(data.min_price || '0')
+        const maxPrice = Number(data.max_price || '100000000')
+        const searchText = data.search || ''
         try {
             console.debug('updating post() started')
 
             if (data.category_id != null) {
+
                 let favoriteList = await db.favorite.findMany({
                     where: { user_id: Number(token.id) },
                 })
 
                 let mainList = await db.posts.findMany({
                     where: {
+                        price: {
+                            gte: minPrice,
+                            lte: maxPrice
+                        },
+                        title: {
+                            contains: searchText
+                        },
                         category_id: Number(data.category_id)
                     },
                     skip: (Number(data.offset) - 1) * Number(data.limit), // Calculate the number of records to skip based on page number
@@ -340,6 +350,15 @@ export default class PostService {
                 })
 
                 let mainList = await db.posts.findMany({
+                    where: {
+                        price: {
+                            gte: minPrice,
+                            lte: maxPrice
+                        },
+                        title: {
+                            contains: searchText
+                        }
+                    },
                     skip: (Number(data.offset) - 1) * Number(data.limit), // Calculate the number of records to skip based on page number
                     take: Number(data.limit), // Set the number of records to be returned per page
                 })
