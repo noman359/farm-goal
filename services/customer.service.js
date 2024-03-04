@@ -61,6 +61,9 @@ export default class CustomerService {
             let newCustomer = await db.users.findFirst({
                 where: {
                     phone_number: customerBody.phone_number
+                },
+                include: {
+                    cities: true
                 }
             })
 
@@ -162,6 +165,9 @@ export default class CustomerService {
                 },
                 where: {
                     id: Number(token.id)
+                },
+                include: {
+                    cities: true
                 }
             })
             console.debug('createCustomer() returning')
