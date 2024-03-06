@@ -3,6 +3,7 @@ import config from '../config/index.js'
 import Prisma from '@prisma/client';
 const { PrismaClient } = Prisma;
 import TokenHandler from "../handlers/token.handler.js"
+import { v4 as uuidv4 } from 'uuid';
 
 let db = new PrismaClient({ log: ['query', 'info', 'warn', 'error'] })
 let bucket = new handler.bucketHandler()
@@ -27,7 +28,7 @@ export default class CustomerService {
                 let extentionName = arr[arr.length - 1]
                 let avatar_val = {
                     bucket: config.customer_avatar_s3_bucket_name,
-                    key: `${customerBody.email}_${customerBody.avatar['name']}.${extentionName}`,
+                    key: `${uuidv4()}.${extentionName}`,
                     body: await bucket.fileToArrayBuffer(customerBody.avatar)
                 }
                 customer_avatar = await bucket.upload(avatar_val)
@@ -114,7 +115,7 @@ export default class CustomerService {
                     let extentionName = arr[arr.length - 1]
                     let avatar_val = {
                         bucket: config.customer_avatar_s3_bucket_name,
-                        key: `${customerBody.email}_${customerBody.avatar['name']}.${extentionName}`,
+                        key: `${uuidv4()}.${extentionName}`,
                         body: await bucket.fileToArrayBuffer(customerBody.avatar)
                     }
                     customer_avatar = await bucket.upload(avatar_val)
@@ -136,9 +137,9 @@ export default class CustomerService {
                 farm_name = customerBody.farm_name
             }
 
-            var image = customer.image
+            var newImage = customer.image
             if (customer_avatar.url) {
-                image = customer_avatar.url
+                newImage = customer_avatar.url
             }
 
             var city_id = customer.city_id
@@ -152,16 +153,17 @@ export default class CustomerService {
             }
 
             // customerBody.password = encryption.encrypt(customerBody.password)
+            console.log(newImage)
             let updatedCustomer = await db.users.update({
                 data: {
                     first_name: first_name || undefined,
                     last_name: last_name || undefined,
-                    image: image || undefined,
                     updated_at: new Date(new Date().toUTCString()),
                     phone_number: customerBody.phone_number || undefined,
                     address: address,
                     farm_name: farm_name,
-                    city_id: Number(city_id)
+                    city_id: Number(city_id),
+                    image: `${newImage}`
                 },
                 where: {
                     id: Number(token.id)
