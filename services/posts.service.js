@@ -40,22 +40,41 @@ export default class PostService {
             const currentDateTime = new Date();
             console.debug('createCustomer() started')
             if (post.images) {
-                for (var image of post.images) {
-                    let post_image = new Object()
-                    var arr = image.name.split('.')
-                    let extentionName = arr[arr.length - 1]
 
-                    let avatar_val = {
-                        bucket: config.jobs_s3_bucket_name,
-                        key: `${currentDateTime.toISOString()}.${extentionName}`,
-                        body: await bucket.fileToArrayBuffer(image)
+                if (post.images.length > 1) {
+
+                    for (var image of post.images) {
+                        let post_image = new Object()
+                        var arr = image.name.split('.')
+                        let extentionName = arr[arr.length - 1]
+    
+                        let avatar_val = {
+                            bucket: config.post_bucket_name,
+                            key: `${currentDateTime.toISOString()}.${extentionName}`,
+                            body: await bucket.fileToArrayBuffer(image)
+                        }
+                        post_image = await bucket.upload(avatar_val)
+                        images.push(post_image.url)
                     }
-                    post_image = await bucket.upload(avatar_val)
-                    images.push(post_image.url)
+
+                } else {
+                    let image = post.images
+                    let post_image = new Object()
+                        var arr = image.name.split('.')
+                        let extentionName = arr[arr.length - 1]
+    
+                        let avatar_val = {
+                            bucket: config.post_bucket_name,
+                            key: `${currentDateTime.toISOString()}.${extentionName}`,
+                            body: await bucket.fileToArrayBuffer(image)
+                        }
+                        post_image = await bucket.upload(avatar_val)
+                        images.push(post_image.url)
                 }
             }
 
-
+            var postImages = images.join(',')
+           
             servResp.data = await db.posts.create({
 
                 data: {
@@ -71,8 +90,9 @@ export default class PostService {
                     age: Number(post.age),
                     status: 'active',
                     user_id: Number(token.id),
-                    category_id: post.category_id,
-                    sub_category_id: post.sub_category_id,
+                    category_id: Number(post.category_id),
+                    views: 0,
+                    sub_category_id: Number(post.sub_category_id),
                     created_at: new Date(new Date().toUTCString())
                 }
 
@@ -142,7 +162,7 @@ export default class PostService {
                     let extentionName = arr[arr.length - 1]
 
                     let avatar_val = {
-                        bucket: config.jobs_s3_bucket_name,
+                        bucket: config.post_bucket_name,
                         key: `${currentDateTime.toISOString()}.${extentionName}`,
                         body: await bucket.fileToArrayBuffer(image)
                     }

@@ -19,10 +19,8 @@ export default {
     AWS_ACCOUNT_SECRET_KEY: process.env.AWS_ACCOUNT_SECRET_KEY,
     AWS_ACCOUNT_REGION: process.env.AWS_ACCOUNT_REGION,
     AWS_ACCOUNT_ID: process.env.AWS_ACCOUNT_ID,
-    card_upload_s3_bucket_name: process.env.card_upload_s3_bucket_name,
-    vendor_avatar_s3_bucket_name: process.env.vendor_avatar_s3_bucket_name,
     customer_avatar_s3_bucket_name: process.env.customer_avatar_s3_bucket_name,
-    jobs_s3_bucket_name: process.env.jobs_s3_bucket_name,
+    post_bucket_name: process.env.post_bucket_name,
     JWT_SECURE_KEY: process.env.JWT_SECURE_KEY,
     environment: process.env.environment,
     
