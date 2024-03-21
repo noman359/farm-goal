@@ -6,6 +6,7 @@ import admin from 'firebase-admin';
 // import serviceAccount from '../urbancabsvender-firebase-adminsdk-70gg2-1c61b6ef2c.json' assert { type: "json" };
 import { parse, format } from 'date-fns';
 import TokenHandler from "../handlers/token.handler.js"
+import { TargetTypeEnum } from 'inversify';
 
 // admin.initializeApp({
 //     credential: admin.credential.cert(serviceAccount),
@@ -125,6 +126,62 @@ export default class PostService {
             servResp.data = await db.posts.findFirst({
                 where: { id: Number(id) },
                 include: { categories: true, subcategory: true }
+            })
+
+            console.debug('updatePost() returning')
+
+        } catch (error) {
+            console.debug('createPost() exception thrown')
+            servResp.isError = true
+            servResp.message = error.message
+        }
+        return servResp
+    }
+
+    async deletePost(req) {
+        let servResp = new config.serviceResponse()
+        let id = req.params.id
+
+        let token = await tokenHandler.checkToken(req)
+        if (token.isError == true) {
+            servResp.isError = true
+            servResp.message = 'Token is not valid'
+            return servResp
+        }
+
+        try {
+            console.debug('updating post() started')
+
+            servResp.data = await db.posts.delete({
+                where: { id: Number(id) }
+            })
+
+            console.debug('updatePost() returning')
+
+        } catch (error) {
+            console.debug('createPost() exception thrown')
+            servResp.isError = true
+            servResp.message = error.message
+        }
+        return servResp
+    }
+
+    async likePost(req) {
+        let servResp = new config.serviceResponse()
+        let id = req.params.id
+
+        let token = await tokenHandler.checkToken(req)
+        if (token.isError == true) {
+            servResp.isError = true
+            servResp.message = 'Token is not valid'
+            return servResp
+        }
+
+        try {
+            console.debug('updating post() started')
+
+            servResp.data = await db.posts.delete({
+                where: { id: Number(id) }
             })
 
             console.debug('updatePost() returning')
@@ -429,6 +486,10 @@ export default class PostService {
                 where: {
                     user_id: Number(token.id)
                 },
+                include: {
+                    categories: true,
+                    subcategory: true
+                },
                 skip: (Number(data.offset) - 1) * Number(data.limit), // Calculate the number of records to skip based on page number
                 take: Number(data.limit), // Set the number of records to be returned per page
             })
@@ -545,11 +606,9 @@ export default class PostService {
         return servResp
     }
 
-    async setFavorite(post) {
+    async setFavorite(req) {
         let servResp = new config.serviceResponse()
-        var images = []
-        console.log(post)
-
+        let id = req.params.id
         let token = await tokenHandler.checkToken(req)
         if (token.isError == true) {
             servResp.isError = true
@@ -560,16 +619,18 @@ export default class PostService {
         try {
             console.debug('updating post() started')
 
-            if (post.post_id != null) {
+            if (id != null || id != undefined) {
                 servResp.data = await db.favorite.delete({
-                    where: { id }
+                    where: { post_id: Number(id),
+                             user_id: Number(token.id)
+                         }
                 })
 
             } else {
                 servResp.data = await db.favorite.create({
                     data: {
                         user_id: Number(token.id),
-                        post_id: Number(post.post_id),
+                        post_id: Number(id),
                         created_at: new Date(new Date().toUTCString())
                     }
                 })

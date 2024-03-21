@@ -25,6 +25,11 @@ export default class PostController {
          next(created_customer)
     }
 
+    async deletePost(req, res, next) {
+        let created_customer = await customerServ.deletePost(req)
+         next(created_customer)
+    }
+
     async incrementView(req, res, next) {
         let created_customer = await customerServ.incrementPostViews(req)
          next(created_customer)
@@ -42,6 +47,11 @@ export default class PostController {
     
     async getPosts(req, res, next) {
         let created_customer = await customerServ.getPosts(req)
+         next(created_customer)
+    }
+
+    async setFavorite(req, res, next) {
+        let created_customer = await customerServ.setFavorite(req)
          next(created_customer)
     }
 
