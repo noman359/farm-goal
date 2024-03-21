@@ -275,7 +275,7 @@ export default class CustomerService {
                 return servResp
             }
             console.debug('getCustomer() started')
-            servResp.data = await db.users.delete({
+            servResp.data = await db.users.deleteMany({
                 where: {
                     id: Number(token.id)
                 }
