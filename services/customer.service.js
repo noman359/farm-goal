@@ -265,6 +265,30 @@ export default class CustomerService {
         return servResp
     }
 
+    async deleteCustomer(req) {
+        let servResp = new config.serviceResponse()
+        try {
+            let token = await tokenHandler.checkToken(req)
+            if (token.isError == true) {
+                servResp.isError = true
+                servResp.message = 'Token is not valid'
+                return servResp
+            }
+            console.debug('getCustomer() started')
+            servResp.data = await db.users.delete({
+                where: {
+                    id: Number(token.id)
+                }
+            })
+            console.debug('getCustomer() returning')
+        } catch (error) {
+            console.debug('getCustomer() exception thrown')
+            servResp.isError = true
+            servResp.message = error.message
+        }
+        return servResp
+    }
+
     async signIn(query) {
         let servResp = new config.serviceResponse()
         try {

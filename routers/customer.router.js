@@ -13,4 +13,5 @@ export default function (router) {
      lRoute.get('/', customerCtrl.getCustomer, handler.apiResponseHandler)
      lRoute.post('/login', customerCtrl.login, handler.apiResponseHandler)
      lRoute.put('/', formData, customerCtrl.updateCustomer, handler.apiResponseHandler)
+     lRoute.delete('/', customerCtrl.deleteCustomer, handler.apiResponseHandler)
 }

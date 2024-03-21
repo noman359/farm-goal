@@ -29,6 +29,11 @@ export default class CustomerController {
         next(customer)
     }
 
+    async deleteCustomer(req, res, next) {
+        let customer = await customerServ.deleteCustomer(req)
+        next(customer)
+    }
+
     async login(req, res, next) {
         let customer = await customerServ.login(req.body)
         next(customer)
