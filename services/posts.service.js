@@ -88,7 +88,9 @@ export default class PostService {
                     long: Number(post.long),
                     quantity: Number(post.quantity),
                     breed: post.breed,
-                    age: Number(post.age),
+                    years: Number(post.years),
+                    months: Number(post.months),
+                    city_id: Number(post.city_id),
                     status: 'active',
                     user_id: Number(token.id),
                     category_id: Number(post.category_id),
@@ -125,7 +127,7 @@ export default class PostService {
 
             servResp.data = await db.posts.findFirst({
                 where: { id: Number(id) },
-                include: { categories: true, subcategory: true }
+                include: { categories: true, subcategory: true, cities: true }
             })
 
             console.debug('updatePost() returning')
@@ -251,8 +253,10 @@ export default class PostService {
                     long: Number(post.long ?? existingData.long),
                     quantity: Number(post.quantity ?? post.quantity),
                     breed: post.breed ?? existingData.post,
-                    age: Number(post.age ?? existingData.age),
                     status: 'active',
+                    years: Number(post.years) ?? existingData.years,
+                    months: Number(post.months) ?? existingData.months,
+                    city_id: Number(post.city_id) ?? existingData.city_id,
                     created_at: new Date(new Date().toUTCString()),
                     featured: Number(post.featured ?? existingData.featured),
                 },
