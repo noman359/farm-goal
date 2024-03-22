@@ -492,7 +492,8 @@ export default class PostService {
                 },
                 include: {
                     categories: true,
-                    subcategory: true
+                    subcategory: true,
+                    cities: true
                 },
                 skip: (Number(data.offset) - 1) * Number(data.limit), // Calculate the number of records to skip based on page number
                 take: Number(data.limit), // Set the number of records to be returned per page
