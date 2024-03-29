@@ -376,6 +376,33 @@ export default class PostService {
         return servResp
     }
 
+    async getFeaturedList(req) {
+        let servResp = new config.serviceResponse()
+        let token = await tokenHandler.checkToken(req)
+        if (token.isError == true) {
+            servResp.isError = true
+            servResp.message = 'Token is not valid'
+            return servResp
+        }
+
+        try {
+            console.debug('updating post() started')
+
+            servResp.data = await db.posts.findMany({
+                where: { featured: 1 },
+                take: 5, // Set the number of records to be returned per page
+            })
+
+            console.debug('updatePost() returning')
+
+        } catch (error) {
+            console.debug('createPost() exception thrown')
+            servResp.isError = true
+            servResp.message = error.message
+        }
+        return servResp
+    }
+
     async getPosts(req) {
         let servResp = new config.serviceResponse()
         var mainListWithFavorites = []

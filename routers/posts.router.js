@@ -14,6 +14,7 @@ export default function (router) {
     lRoute.post('/view/:id', jobsController.incrementView,handler.apiResponseHandler)
     lRoute.post('/status/:id', jobsController.changeAdStatus,handler.apiResponseHandler)
     lRoute.post('/featured/:id', jobsController.featured,handler.apiResponseHandler)
+    lRoute.get('/featured/list', jobsController.getFeaturedList,handler.apiResponseHandler)
     lRoute.get('/list', jobsController.getPosts,handler.apiResponseHandler)
     lRoute.post('/like/:id', jobsController.setFavorite,handler.apiResponseHandler)
     lRoute.get('/myads', jobsController.getMyads,handler.apiResponseHandler)

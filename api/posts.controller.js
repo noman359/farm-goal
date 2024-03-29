@@ -44,6 +44,11 @@ export default class PostController {
         let created_customer = await customerServ.changeFeaturedStatus(req)
          next(created_customer)
     }
+
+    async getFeaturedList(req, res, next) {
+        let created_customer = await customerServ.getFeaturedList(req)
+         next(created_customer)
+    }
     
     async getPosts(req, res, next) {
         let created_customer = await customerServ.getPosts(req)
