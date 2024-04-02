@@ -48,7 +48,7 @@ export default class PostService {
                         let post_image = new Object()
                         var arr = image.name.split('.')
                         let extentionName = arr[arr.length - 1]
-    
+
                         let avatar_val = {
                             bucket: config.post_bucket_name,
                             key: `${currentDateTime.toISOString()}.${extentionName}`,
@@ -61,21 +61,21 @@ export default class PostService {
                 } else {
                     let image = post.images
                     let post_image = new Object()
-                        var arr = image.name.split('.')
-                        let extentionName = arr[arr.length - 1]
-    
-                        let avatar_val = {
-                            bucket: config.post_bucket_name,
-                            key: `${currentDateTime.toISOString()}.${extentionName}`,
-                            body: await bucket.fileToArrayBuffer(image)
-                        }
-                        post_image = await bucket.upload(avatar_val)
-                        images.push(post_image.url)
+                    var arr = image.name.split('.')
+                    let extentionName = arr[arr.length - 1]
+
+                    let avatar_val = {
+                        bucket: config.post_bucket_name,
+                        key: `${currentDateTime.toISOString()}.${extentionName}`,
+                        body: await bucket.fileToArrayBuffer(image)
+                    }
+                    post_image = await bucket.upload(avatar_val)
+                    images.push(post_image.url)
                 }
             }
 
             var postImages = images.join(',')
-           
+
             servResp.data = await db.posts.create({
 
                 data: {
@@ -652,13 +652,24 @@ export default class PostService {
             console.debug('updating post() started')
 
             if (id != null || id != undefined) {
-                servResp.data = await db.favorite.delete({
-                    where: { post_id: Number(id),
-                             user_id: Number(token.id)
-                         }
+                let fav = await db.favorite.findFirst({
+                    where: {
+                        post_id: Number(id)
+                    }
                 })
 
-            } else {
+
+                if (fav !== null) {
+                    servResp.data = await db.favorite.delete({
+                        where: {
+                            id: Number(fav.id),
+                            post_id: Number(id),
+                            user_id: Number(token.id)
+                        }
+                    })
+                    return servResp
+                } 
+
                 servResp.data = await db.favorite.create({
                     data: {
                         user_id: Number(token.id),
@@ -666,8 +677,7 @@ export default class PostService {
                         created_at: new Date(new Date().toUTCString())
                     }
                 })
-            }
-
+            } 
 
             console.debug('updatePost() returning')
 
