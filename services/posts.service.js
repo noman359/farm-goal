@@ -654,7 +654,8 @@ export default class PostService {
             if (id != null || id != undefined) {
                 let fav = await db.favorite.findFirst({
                     where: {
-                        post_id: Number(id)
+                        post_id: Number(id),
+                        user_id: Number(token.id)
                     }
                 })
 
