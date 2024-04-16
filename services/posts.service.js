@@ -416,102 +416,67 @@ export default class PostService {
             servResp.message = 'Token is not valid'
             return servResp
         }
-        const minPrice = Number(data.min_price || '0')
-        const maxPrice = Number(data.max_price || '100000000')
+
         const searchText = data.search || ''
+
+        var query = {};
+
+        if (searchText != '') {
+            query.title = { contains: searchText };
+        }
+
+        if (data.min_price || data.max_price) {
+            const minPrice = Number(data.min_price || '0')
+            const maxPrice = Number(data.max_price || '100000000')
+            query.price = {
+                gte: minPrice,
+                lte: maxPrice
+            }
+        }
+
+
+        if (data.year) {
+            query.years = Number(data.year);
+        }
+
+        if (data.month) {
+            query.months = Number(data.month);
+        }
+
+        if (data.category_id) {
+            query.category_id = Number(data.category_id)
+        }
+
+
         try {
             console.debug('updating post() started')
 
-            if (data.category_id != null) {
 
-                let favoriteList = await db.favorite.findMany({
-                    where: { user_id: Number(token.id) },
-                })
+            let favoriteList = await db.favorite.findMany({
+                where: { user_id: Number(token.id) },
+            })
 
-                let mainList = await db.posts.findMany({
-                    where: {
+            let mainList = await db.posts.findMany({
+                where: query,
+                orderBy: {
+                    created_at: 'asc'
+                },
+                skip: (Number(data.offset) - 1) * Number(data.limit), // Calculate the number of records to skip based on page number
+                take: Number(data.limit), // Set the number of records to be returned per page
+            })
 
-                        title: {
-                            contains: searchText
-                        },
-                        price: {
-                            gte: minPrice,
-                            lte: maxPrice
-                        },
-                        
-                        OR: [
-                            {
-                                years: Number(data.year) || undefined,
-                            },
-                            {
-                                months: Number(data.month) || undefined,
-                            }
-                        ],
-                        category_id: Number(data.category_id)
+            // Create a mapping of itemId to favorited status
+            const favoritedMap = favoriteList.reduce((map, favorite) => {
+                map[favorite.post_id] = true;
+                return map;
+            }, {});
 
-                    },
-                    orderBy: {
-                        created_at: 'asc'
-                    },
-                    skip: (Number(data.offset) - 1) * Number(data.limit), // Calculate the number of records to skip based on page number
-                    take: Number(data.limit), // Set the number of records to be returned per page
-                })
+            // Update the mainList with favorited status
+            mainListWithFavorites = mainList.map((item) => ({
+                ...item,
+                isFavorited: favoritedMap[item.id] || false,
+            }));
 
-                // Create a mapping of itemId to favorited status
-                const favoritedMap = favoriteList.reduce((map, favorite) => {
-                    map[favorite.post_id] = true;
-                    return map;
-                }, {});
-
-                // Update the mainList with favorited status
-                mainListWithFavorites = mainList.map((item) => ({
-                    ...item,
-                    isFavorited: favoritedMap[item.id] || false,
-                }));
-
-            } else {
-                let favoriteList = await db.favorite.findMany({
-                    where: { user_id: Number(token.id) },
-                })
-
-                let mainList = await db.posts.findMany({
-                    where: {
-                        title: {
-                            contains: searchText
-                        },
-                        price: {
-                            gte: minPrice,
-                            lte: maxPrice
-                        },
-                        
-                        OR: [
-                            {
-                                years: Number(data.year) || undefined,
-                            },
-                            {
-                                months: Number(data.month) || undefined,
-                            }
-                        ],
-                    },
-                    orderBy: {
-                        created_at: 'asc'
-                    },
-                    skip: (Number(data.offset) - 1) * Number(data.limit), // Calculate the number of records to skip based on page number
-                    take: Number(data.limit), // Set the number of records to be returned per page
-                })
-
-                // Create a mapping of itemId to favorited status
-                const favoritedMap = favoriteList.reduce((map, favorite) => {
-                    map[favorite.post_id] = true;
-                    return map;
-                }, {});
-
-                // Update the mainList with favorited status
-                mainListWithFavorites = mainList.map((item) => ({
-                    ...item,
-                    isFavorited: favoritedMap[item.id] || false,
-                }));
-            }
 
             servResp.data = mainListWithFavorites
             console.debug('updatePost() returning')
