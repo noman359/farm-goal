@@ -390,6 +390,9 @@ export default class PostService {
 
             servResp.data = await db.posts.findMany({
                 where: { featured: 1 },
+                orderBy: {
+                    created_at: 'asc'
+                },
                 take: 5, // Set the number of records to be returned per page
             })
 
@@ -427,14 +430,28 @@ export default class PostService {
 
                 let mainList = await db.posts.findMany({
                     where: {
+
+                        title: {
+                            contains: searchText
+                        },
                         price: {
                             gte: minPrice,
                             lte: maxPrice
                         },
-                        title: {
-                            contains: searchText
-                        },
+                        
+                        OR: [
+                            {
+                                years: Number(data.year) || undefined,
+                            },
+                            {
+                                months: Number(data.month) || undefined,
+                            }
+                        ],
                         category_id: Number(data.category_id)
+
+                    },
+                    orderBy: {
+                        created_at: 'asc'
                     },
                     skip: (Number(data.offset) - 1) * Number(data.limit), // Calculate the number of records to skip based on page number
                     take: Number(data.limit), // Set the number of records to be returned per page
@@ -459,13 +476,25 @@ export default class PostService {
 
                 let mainList = await db.posts.findMany({
                     where: {
+                        title: {
+                            contains: searchText
+                        },
                         price: {
                             gte: minPrice,
                             lte: maxPrice
                         },
-                        title: {
-                            contains: searchText
-                        }
+                        
+                        OR: [
+                            {
+                                years: Number(data.year) || undefined,
+                            },
+                            {
+                                months: Number(data.month) || undefined,
+                            }
+                        ],
+                    },
+                    orderBy: {
+                        created_at: 'asc'
                     },
                     skip: (Number(data.offset) - 1) * Number(data.limit), // Calculate the number of records to skip based on page number
                     take: Number(data.limit), // Set the number of records to be returned per page
@@ -522,6 +551,9 @@ export default class PostService {
                     subcategory: true,
                     cities: true
                 },
+                orderBy: {
+                    created_at: 'asc'
+                },
                 skip: (Number(data.offset) - 1) * Number(data.limit), // Calculate the number of records to skip based on page number
                 take: Number(data.limit), // Set the number of records to be returned per page
             })
@@ -576,7 +608,10 @@ export default class PostService {
                     where: {
                         category_id: Number(catItem.id)
                     },
-                    take: 10
+                    take: 10,
+                    orderBy: {
+                        created_at: 'asc'
+                    },
                 })
 
                 const favoritedMap = favoriteList.reduce((map, favorite) => {
@@ -625,7 +660,10 @@ export default class PostService {
                 take: Number(queryParams.limit), // Set the number of records to be returned per page
                 include: {
                     posts: true
-                }
+                },
+                orderBy: {
+                    created_at: 'asc'
+                },
             })
 
             console.debug('updatePost() returning')
@@ -669,7 +707,7 @@ export default class PostService {
                         }
                     })
                     return servResp
-                } 
+                }
 
                 servResp.data = await db.favorite.create({
                     data: {
@@ -678,7 +716,7 @@ export default class PostService {
                         created_at: new Date(new Date().toUTCString())
                     }
                 })
-            } 
+            }
 
             console.debug('updatePost() returning')
 
